@@ -8,6 +8,9 @@ My Today I Learned snippets. Inspired by [jbranchaud/til][1] and [simonw/til][2]
 
 * [rel-me](microformats/rel-me.md)
 
+---
+Copyright (c) 2022 Luca Filipozzi
+
 [1]: https://github.com/jbranchaud/til
 [2]: https://github.com/simonw/til
 [3]: https://dev.to/jbranchaud/how-i-built-a-learning-machine-45k9
