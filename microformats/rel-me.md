@@ -8,6 +8,9 @@ describes a clever means by which to overcome Mastodon / GitHub limitations
 relating to identity verification by utilizing a GitHub-pages site as an
 intermediate hop.
 
+---
+Copyright (c) 2022 Luca Filipozzi
+
 [1]: https://microformats.org/wiki/rel-me
 [2]: https://fedi.simonwillison.net/@simon
 [3]: https://til.simonwillison.net/mastodon/verifying-github-on-mastodon
