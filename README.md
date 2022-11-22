@@ -5,8 +5,10 @@ My Today I Learned snippets. Inspired by [jbranchaud/til][1] and [simonw/til][2]
 ### Categories
 
 #### microformats
-
 * [rel-me](microformats/rel-me.md)
+
+#### shell
+* [prompt format](shell/prompt-format.md)
 
 ---
 Copyright (c) 2022 Luca Filipozzi
