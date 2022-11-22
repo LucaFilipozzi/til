@@ -38,7 +38,7 @@ format = "[$user]($style) on "
 show_always = true
 ```
 
-Some of symbol choices is due to unicode limitations on some systems. Still debugging that.
+Some symbol choices are due to Unicode limitations on some systems. Still debugging that.
 
 [1]: https://github.com/LucaFilipozzi/fish-theme-lfilipoz
 [2]: https://github.com/robertgzr/porcelain
