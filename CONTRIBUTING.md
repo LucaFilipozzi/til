@@ -1,1 +1,1 @@
-Pull requests will be reviewed by not necessarily merged.
+Pull requests will be reviewed but not necessarily merged.
