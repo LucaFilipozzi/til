@@ -1,4 +1,4 @@
-# Development Tool Version Management
+# development tool version management with `asdf`
 
 It runs counter to my Debian upbringing (package all the things; install once; leverage security updates) but,
 unfortunatly, the global development community has eschewed OS pakcage managers (the packages aren't up to date,
