@@ -8,8 +8,8 @@ My Today I Learned snippets. Inspired by [jbranchaud/til][1] and [simonw/til][2]
 * [rel-me](microformats/rel-me.md)
 
 #### shell
-* [development tool version management](shell/development_tool_version_management.md)
-* [prompt format](shell/prompt-format.md)
+* [development tool version management with `asdf`](shell/development_tool_version_management_with_asdf.md)
+* [prompt format with `starship`](shell/prompt_format_with_starship.md)
 
 ---
 Copyright (c) 2022 Luca Filipozzi
