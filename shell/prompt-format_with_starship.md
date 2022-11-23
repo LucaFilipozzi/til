@@ -1,4 +1,4 @@
-# Prompt Format
+# prompt format with `starship`
 
 Spending time at a shell prompt means having an opinion about interactive shell (fish, another topic)
 and prompt format.
