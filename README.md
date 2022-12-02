@@ -5,7 +5,7 @@ My Today I Learned snippets. Inspired by [jbranchaud/til][1] and [simonw/til][2]
 ### Categories
 
 #### json
-* [making JSON greppable with `gron`](json/making-json-greppable-with-gron.md)
+* [making JSON greppable with `gron`](json/making_json_greppable_with_gron.md)
 
 #### microformats
 * [rel-me](microformats/rel-me.md)
