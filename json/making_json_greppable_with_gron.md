@@ -1,3 +1,5 @@
+# gron
+
 TIL about [gron](https://github.com/tomnomnom/gron), a utility that transforms JSON into discrete
 assignments that allows one to use familiar text utils (`grep`, `sed`, `awd`, etc.) to understand
 the structure and content of the JSON.
@@ -13,3 +15,6 @@ json[0].commit.author.name = "Tom Hudson";
 ```
 
 I'm off to inspect response payloads.
+
+---
+Copyright (c) 2022 Luca Filipozzi
