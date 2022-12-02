@@ -1,4 +1,4 @@
-# gron
+# making JSON greppable with `gron`
 
 TIL about [gron](https://github.com/tomnomnom/gron), a utility that transforms JSON into discrete
 assignments that allows one to use familiar text utils (`grep`, `sed`, `awd`, etc.) to understand
