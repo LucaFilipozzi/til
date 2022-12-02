@@ -40,6 +40,9 @@ show_always = true
 
 Some symbol choices are due to Unicode limitations on some systems. Still debugging that.
 
+---
+Copyright (c) 2022 Luca Filipozzi
+
 [1]: https://github.com/LucaFilipozzi/fish-theme-lfilipoz
 [2]: https://github.com/robertgzr/porcelain
 [3]: https://github.com/starship/starship
