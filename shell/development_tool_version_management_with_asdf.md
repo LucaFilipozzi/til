@@ -50,6 +50,9 @@ layout python3
 
 (It'd be elegant if the second directive were `use python`.)
 
+---
+Copyright (c) 2022 Luca Filipozzi
+
 [1]: https://github.com/asdf-vm/asdf
 [2]: https://github.com/direnv/direnv
 [3]: https://github.com/asdf-community/asdf-direnv
