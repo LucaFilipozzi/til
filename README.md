@@ -8,7 +8,7 @@ My Today I Learned snippets. Inspired by [jbranchaud/til][1] and [simonw/til][2]
 * [making JSON greppable with `gron`](json/making_json_greppable_with_gron.md)
 
 #### microformats
-* [rel-me](microformats/rel-me.md)
+* [verifying identity with rel-me](microformats/verifying_identity_with_rel-me.md)
 
 #### shell
 * [development tool version management with `asdf`](shell/development_tool_version_management_with_asdf.md)
