@@ -16,7 +16,7 @@ once:
 * restore github profile website
 
 By leveraging this once-only-verification, I have managed to add both
-[github](https://github.org/LucaFilipozzi) and [debian](https://nm.debian.org/person/lfilipoz/) links to my
+[github](https://github.com/LucaFilipozzi) and [debian](https://nm.debian.org/person/lfilipoz/) links to my
 [fosstodon](https://fosstodon.org/@LucaFilipozzi) profile.
 
 ---
