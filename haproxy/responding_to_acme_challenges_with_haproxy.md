@@ -70,6 +70,7 @@ Specify RSA or ECDSA key generation using dehydrated's [per-certificate configur
 
 ```bash
 #!/bin/bash
+# Copyright (c) 2023 Luca Filipozzi
 
 deploy_challenge() {
     local DOMAIN="${1}" TOKEN="${2}" VALUE="${3}"
@@ -82,15 +83,18 @@ clean_challenge() {
 }
 
 deploy_cert() {
-    local DOMAIN="${1}" KEY="${2}" CRT="${3}" CHN="${5}" ALIAS="$(basename $(dirname ${2}))"
-    local OUT="$(dirname ${2})/haproxy.pem.${ALIAS##*.}"
-    cat ${CRT} ${CHN} ${KEY} > ${OUT}
+    local DOMAIN="${1}" PRIVKEY="${2}" CERT="${3}" FULLCHAIN="${4}" CHAIN="${5}" TS="${6}" ALIAS="$(basename $(dirname ${2}))"
+    local DIR=$(dirname ${PRIVKEY})
+    local EXT=${ALIAS##*.}
+    ln -sf ${FULLCHAIN} ${DIR}/haproxy.${EXT}
+    ln -sf ${PRIVKEY}   ${DIR}/haproxy.${EXT}.key
 }
 
 deploy_ocsp() {
-    local DOMAIN="${1}" DER="${2}" TS="${3}" ALIAS="$(basename $(dirname ${2}))"
-    local OUT="$(dirname ${2})/haproxy.pem.${ALIAS##*.}.ocsp"
-    cat ${DER} > ${OUT}
+    local DOMAIN="${1}" OCSP="${2}" TS="${3}" ALIAS="$(basename $(dirname ${2}))"
+    local DIR=$(dirname ${OCSP})
+    local EXT=${ALIAS##*.}
+    ln -sf ${OCSP}      ${DIR}/haproxy.${EXT}.ocsp
 }
 
 unchanged_cert() {
@@ -115,7 +119,6 @@ startup_hook() {
 
 exit_hook() {
     systemctl reload-or-restart haproxy
-    :
 }
 
 HANDLER="$1"; shift
@@ -135,10 +138,10 @@ fi
 #### /etc/haproxy/cert.lst
 
 ```plaintext
-/var/lib/dehydrated/certs/example.com.rsa/haproxy.pem.rsa        [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.com.ecdsa/haproxy.pem.ecdsa    [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.org.rsa/haproxy.pem.rsa        [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.org.ecdsa/haproxy.pem.ecdsa    [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.com.rsa/haproxy.rsa      [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.com.ecdsa/haproxy.ecdsa  [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.org.rsa/haproxy.rsa      [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.org.ecdsa/haproxy.ecdsa  [alpn h2,http/1.1]
 ```
 
 #### /etc/haproxy/haproxy.cfg
