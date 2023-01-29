@@ -14,9 +14,9 @@ But it has always bothered me that I needed apache2 to respond to ACME challenge
 
 The key points:
 
-* haproxy can be configured to expose an administrative socket over which commands may be issued, including the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
-* dehydrated can be configured to invoke a hook script, which it will call at various points during the process of obtaining a certificate; two of these hook points (deploy_challenge and clean_challenge) can be used to issue commands to haproxy via it's administrative socket to update the map with responses to ACME challenges
-* haproxy's `http-request respond` directive can be used to respond to client requests without forwarding to a backend, which can look up responses in the hook-maintained ACME map when the request's path begins with `/.well-known/acme-challenge/`
+* haproxy can be configured to expose an admin socket over which commands may be issued, including the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
+* dehydrated can be configured to invoke a hook script, which it will call at various points during the process of obtaining a certificate; two of these hook points (deploy_challenge and clean_challenge) can be used to issue commands to haproxy via it's admin socket to update the map with responses to ACME challenges
+* haproxy's [`http-request return`](http://docs.haproxy.org/2.6/configuration.html#http-request%20return) directive can be used to respond to client requests without forwarding to a backend and whose `lf-string` parameter can look up responses in the hook-maintained ACME map when the request's path begins with `/.well-known/acme-challenge/`
 
 Additional observations:
 * dehydrated allows [multiple aliases per certificate](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
