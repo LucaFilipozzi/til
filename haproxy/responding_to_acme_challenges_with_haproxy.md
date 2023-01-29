@@ -20,8 +20,8 @@ The key points:
 
 Additional observations:
 * dehydrated allows [multiple aliases per certificate](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
-* dehydrated allows [per-certificate configuration](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
-* the above two dehydrated featues are used below to obtain both RSA and ECDSA certificates for a domain
+* dehydrated allows [alternate configuration per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
+* the above two dehydrated featues are used to obtain both RSA and ECDSA certificates for a domain
 
 ## configuration
 
@@ -43,9 +43,9 @@ WELLKNOWN="${BASEDIR}/acme-challenges"
 
 #### /etc/dehydrated/domains.txt
 
-Specify aliases in order to leverage [per-certificate configuration](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) to obtain both RSA and ECDSA certificates for a domain.
+Specify aliases in order to leverage dehydrated's [alternate configuration per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) feature to obtain both RSA and ECDSA certificates for a domain.
 
-Note that the alias name must end in `rsa` or `ecdsa` as these values meaningful to haproxy: the hook script parses these values from the alias name rather than maintaining an internal mapping of some kind.
+Note that the alias name must end in `rsa` or `ecdsa` as these values [meaningful to haproxy](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files): the hook script parses these values from the alias name rather than maintaining an internal mapping of some kind.
 
 ```text
 # format is: domainName [, domainAltName(s)] > alias
