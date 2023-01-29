@@ -16,7 +16,7 @@ The key points:
 
 * haproxy can be configured to expose an administrative socket over which commands may be issued, including the [addition](https://www.haproxy.com/documentation/hapee/latest/api/runtime-api/add-map/) and [deletion](https://www.haproxy.com/documentation/hapee/latest/api/runtime-api/del-map/) of entries into an existing map
 * dehydrated can be configured to invoke a hook script, which it will call at various points during the process of obtaining a certificate; two of these hook points (deploy_challenge and clean_challenge) can be used to issue commands to haproxy via it's administrative coscket
-* haproxy's `http-request respond` directive can be used to respond to client requests without forwarding to a backend, which can be look up responses in the hook-maintained map
+* haproxy's `http-request respond` directive can be used to respond to client requests without forwarding to a backend, which can look up responses in the hook-maintained map
 
 ## configuration
 
