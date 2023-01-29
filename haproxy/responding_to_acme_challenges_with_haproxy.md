@@ -19,7 +19,7 @@ The key points:
 * haproxy's [`http-request return`](http://docs.haproxy.org/2.6/configuration.html#http-request%20return) directive can be used to respond to client requests without forwarding to a backend and whose `lf-string` parameter can look up responses in the hook-maintained ACME map when the request's path begins with `/.well-known/acme-challenge/`
 
 Additional observations:
-* dehydrated allows [multiple aliases per certificate](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
+* dehydrated allows [multiple aliases per domain](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
 * dehydrated allows [alternate configurations per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
 * the above two dehydrated featues are used to obtain both RSA and ECDSA certificates for a domain
 
@@ -43,9 +43,9 @@ WELLKNOWN="${BASEDIR}/acme-challenges"
 
 #### /etc/dehydrated/domains.txt
 
-Specify aliases in order to leverage dehydrated's [alternate configuration per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) feature to obtain both RSA and ECDSA certificates for a domain.
+Specify [multiple aliases per domain](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases) to leverage dehydrated's [alternate configurations per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) feature to obtain both RSA and ECDSA certificates for a domain.
 
-Note that the alias name must end in `rsa` or `ecdsa` as these values [meaningful to haproxy](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files): the hook script parses these values from the alias name rather than maintaining an internal mapping of some kind.
+Note that the alias name must end in either `rsa` or `ecdsa` as these values [meaningful to haproxy](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files): the hook script parses these values from the alias rather than attempting discerning the type of private key.
 
 ```text
 # format is: domainName [, domainAltName(s)] > alias
