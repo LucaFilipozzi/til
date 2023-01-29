@@ -5,7 +5,7 @@ My Today I Learned snippets. Inspired by [jbranchaud/til][1] and [simonw/til][2]
 ### Categories
 
 #### haproxy
-* [responding to acme challenges with haproxy](haproxy/responding+to_acme_challenges_with_haproxy.md)
+* [responding to acme challenges with `haproxy`](haproxy/responding_to_acme_challenges_with_haproxy.md)
 
 #### json
 * [making JSON greppable with `gron`](json/making_json_greppable_with_gron.md)
