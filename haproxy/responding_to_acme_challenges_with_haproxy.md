@@ -45,32 +45,32 @@ WELLKNOWN="${BASEDIR}/acme-challenges"
 
 Specify [multiple aliases per domain](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases) to leverage dehydrated's [alternate configurations per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) feature to obtain both RSA and ECDSA certificates for a domain.
 
-Note that the alias name must end in either `rsa` or `ecdsa` as these values [meaningful to haproxy](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files): the hook script parses these values from the alias rather than attempting discerning the type of private key.
-
 ```text
 # format is: domainName [, domainAltName(s)] > alias
-example.com > example.com.ecdsa
+example.com > example.com.ecc
 example.com > example.com.rsa
-example.org > example.org.ecdsa
+example.org > example.org.ecc
 example.org > example.org.rsa
 ```
 
 #### /etc/dehydrated/domains.d/*
 
-Specify RSA or ECDSA key generation using dehydrated's [per-certificate configuration](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
+Specify RSA or ECDSA key generation using dehydrated's [alternate configurations per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) feature.
 
-| filename          | contents               |
-| ----------------- | ---------------------- |
-| example.com.ecdsa | `KEY_ALGO="secp384r1"` |
-| example.com.rsa   | `KEY_ALGO="rsa"`       |
-| example.org.ecdsa | `KEY_ALGO="secp384r1"` |
-| example.org.rsa   | `KEY_ALGO="rsa"`       |
+| filename        | contents               |
+| --------------- | ---------------------- |
+| example.com.ecc | `KEY_ALGO="secp384r1"` |
+| example.com.rsa | `KEY_ALGO="rsa"`       |
+| example.org.ecc | `KEY_ALGO="secp384r1"` |
+| example.org.rsa | `KEY_ALGO="rsa"`       |
 
 #### /etc/dehydrated/hook.sh
 
 ```bash
 #!/bin/bash
 # Copyright (c) 2023 Luca Filipozzi
+
+declare -A alg2ext=( ["rsaEncryption"]="rsa" ["id-ecPublicKey"]="ecdsa" )
 
 deploy_challenge() {
     local DOMAIN="${1}" TOKEN="${2}" VALUE="${3}"
@@ -83,17 +83,19 @@ clean_challenge() {
 }
 
 deploy_cert() {
-    local DOMAIN="${1}" PRIVKEY="${2}" CERT="${3}" FULLCHAIN="${4}" CHAIN="${5}" TS="${6}" ALIAS="$(basename $(dirname ${2}))"
+    local DOMAIN="${1}" PRIVKEY="${2}" CERT="${3}" FULLCHAIN="${4}" CHAIN="${5}" TIMESTAMP="${6}"
     local DIR=$(dirname ${PRIVKEY})
-    local EXT=${ALIAS##*.}
+    local ALG=$(openssl x509 -in ${DIR}/cert.pem -noout -text | awk -F':' '/Public Key Algorithm/ {print $2}' | tr -d ' ')
+    local EXT=${alg2ext[${ALG}]}
     ln -sf ${FULLCHAIN} ${DIR}/haproxy.${EXT}
     ln -sf ${PRIVKEY}   ${DIR}/haproxy.${EXT}.key
 }
 
 deploy_ocsp() {
-    local DOMAIN="${1}" OCSP="${2}" TS="${3}" ALIAS="$(basename $(dirname ${2}))"
+    local DOMAIN="${1}" OCSP="${2}" TIMESTAMP="${3}"
     local DIR=$(dirname ${OCSP})
-    local EXT=${ALIAS##*.}
+    local ALG=$(openssl x509 -in ${DIR}/cert.pem -noout -text | awk -F':' '/Public Key Algorithm/ {print $2}' | tr -d ' ')
+    local EXT=${alg2ext[${ALG}]}
     ln -sf ${OCSP}      ${DIR}/haproxy.${EXT}.ocsp
 }
 
@@ -124,7 +126,6 @@ exit_hook() {
 HANDLER="$1"; shift
 if [[ "${HANDLER}" =~ ^(deploy_challenge|clean_challenge|deploy_cert|deploy_ocsp|unchanged_cert|invalid_challenge|request_failure|generate_csr|startup_hook|exit_hook)$ ]]; then
     "$HANDLER" "$@"
-fi
 ```
 
 ### haproxy
@@ -138,10 +139,10 @@ fi
 #### /etc/haproxy/cert.lst
 
 ```plaintext
-/var/lib/dehydrated/certs/example.com.rsa/haproxy.rsa      [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.com.ecdsa/haproxy.ecdsa  [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.org.rsa/haproxy.rsa      [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.org.ecdsa/haproxy.ecdsa  [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.com.rsa/haproxy  [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.com.ecc/haproxy  [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.org.rsa/haproxy  [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.org.ecc/haproxy  [alpn h2,http/1.1]
 ```
 
 #### /etc/haproxy/haproxy.cfg
