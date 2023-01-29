@@ -1,2 +1,0 @@
-# respond_to_acme_challenges_in_haproxy
-
