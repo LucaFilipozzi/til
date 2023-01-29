@@ -14,9 +14,14 @@ But it has always bothered me that I needed apache2 to respond to ACME challenge
 
 The key points:
 
-* haproxy can be configured to expose an administrative socket over which commands may be issued, including the [addition](https://www.haproxy.com/documentation/hapee/latest/api/runtime-api/add-map/) and [deletion](https://www.haproxy.com/documentation/hapee/latest/api/runtime-api/del-map/) of entries into an existing map
-* dehydrated can be configured to invoke a hook script, which it will call at various points during the process of obtaining a certificate; two of these hook points (deploy_challenge and clean_challenge) can be used to issue commands to haproxy via it's administrative coscket
-* haproxy's `http-request respond` directive can be used to respond to client requests without forwarding to a backend, which can look up responses in the hook-maintained map
+* haproxy can be configured to expose an administrative socket over which commands may be issued, including the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
+* dehydrated can be configured to invoke a hook script, which it will call at various points during the process of obtaining a certificate; two of these hook points (deploy_challenge and clean_challenge) can be used to issue commands to haproxy via it's administrative socket to update the map with responses to ACME challenges
+* haproxy's `http-request respond` directive can be used to respond to client requests without forwarding to a backend, which can look up responses in the hook-maintained ACME map when the request's path begins with `/.well-known/acme-challenge/`
+
+Additional observations:
+* dehydrated allows [multiple aliases per certificate](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
+* dehydrated allows [per-certificate configuration](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
+* the above two dehydrated featues are used below to obtain both RSA and ECDSA certificates for a domain
 
 ## configuration
 
@@ -38,7 +43,12 @@ WELLKNOWN="${BASEDIR}/acme-challenges"
 
 #### /etc/dehydrated/domains.txt
 
+Specify aliases in order to leverage [per-certificate configuration](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) to obtain both RSA and ECDSA certificates for a domain.
+
+Note that the alias name must end in `rsa` or `ecdsa` as these values meaningful to haproxy: the hook script parses these values from the alias name rather than maintaining an internal mapping of some kind.
+
 ```text
+# format is: domainName [, domainAltName(s)] > alias
 example.com > example.com.ecdsa
 example.com > example.com.rsa
 example.org > example.org.ecdsa
@@ -46,6 +56,8 @@ example.org > example.org.rsa
 ```
 
 #### /etc/dehydrated/domains.d/*
+
+Specify RSA or ECDSA key generation using dehydrated's [per-certificate configuration](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
 
 | filename          | contents               |
 | ----------------- | ---------------------- |
@@ -120,18 +132,31 @@ fi
 # intentionally empty
 ```
 
+#### /etc/haproxy/cert.lst
+
+```plaintext
+/var/lib/dehydrated/certs/example.com.rsa/haproxy.pem.rsa        [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.com.ecdsa/haproxy.pem.ecdsa    [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.org.rsa/haproxy.pem.rsa        [alpn h2,http/1.1]
+/var/lib/dehydrated/certs/example.org.ecdsa/haproxy.pem.ecdsa    [alpn h2,http/1.1]
+```
+
 #### /etc/haproxy/haproxy.cfg
 
 ```haproxy
 global
     stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
 
-frontend ingress
+frontend http-ingress
     bind :80
     acl is_acme path_dir /.well-known/acme-challenge/
     http-request redirect scheme https code 301 unless is_acme
     http-request return status 200 content-type application/octet-stream lf-string %[path,map_end(/etc/haproxy/acme.map,nope)] if is_acme
     http-request deny deny_status 500
+    
+frontend https-ingress
+    bind :443 strict-sni ssl crt-list /etc/haproxy/cert.lst ecdhe secp384r1
+    default_backend apache2
 ```
 
 ---
