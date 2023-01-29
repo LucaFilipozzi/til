@@ -20,7 +20,7 @@ The key points:
 
 Additional observations:
 * dehydrated allows [multiple aliases per certificate](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
-* dehydrated allows [alternate configuration per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
+* dehydrated allows [alternate configurations per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md)
 * the above two dehydrated featues are used to obtain both RSA and ECDSA certificates for a domain
 
 ## configuration
