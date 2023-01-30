@@ -20,7 +20,7 @@ The key points:
 * haproxy's [`ssl-load-extra-files`](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files) directive can be used to instruct haproxy to look for cert bundles named as follows:
     * «basename».\[rsa|ecdsa\] - contains the end-entity certificate and intermediate certificates (if any); equivalent to dehydrated's fullchain.pem
     * «basename».\[rsa|ecdsa\].key - contains the end-entity private key; equivalent to dehydrated's privkey.pem
-    * «basename».\[rsa|ecdsa\].ocsp - contains the OCSP; equivalent to ocsp.der
+    * «basename».\[rsa|ecdsa\].ocsp - contains the OCSP; equivalent to dehydrated's ocsp.der
 
 Additional observations:
 * dehydrated allows [multiple aliases per domain](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
