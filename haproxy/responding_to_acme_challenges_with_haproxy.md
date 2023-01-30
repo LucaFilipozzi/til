@@ -21,7 +21,6 @@ The key points:
     * «basename».\[rsa|ecdsa\] - contains the end-entity certificate and intermediate certificates (if any); equivalent to dehydrated's fullchain.pem
     * «basename».\[rsa|ecdsa\].key - contains the end-entity private key; equivalent to dehydrated's privkey.pem
     * «basename».\[rsa|ecdsa\].ocsp - contains the OCSP; equivalent to ocsp.der
-* haproxy's [`crt-list`](http://docs.haproxy.org/2.6/configuration.html#5.1-crt-list) directive can be used to 
 
 Additional observations:
 * dehydrated allows [multiple aliases per domain](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
