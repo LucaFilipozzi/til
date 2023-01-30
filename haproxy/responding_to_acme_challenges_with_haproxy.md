@@ -14,7 +14,7 @@ But it has always bothered me that I needed apache2 to respond to ACME challenge
 
 The key points:
 
-* haproxy can be configured to [expose an admin socket](http://docs.haproxy.org/2.6/configuration.html#stats%20socket) over which commands may be issued, including the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
+* haproxy can be configured to [expose an admin socket](http://docs.haproxy.org/2.6/configuration.html#stats%20socket) over which instructions may be issued, including two which cuase the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
 * dehydrated can be configured to invoke a hook script, which it will call at various points during the process of obtaining a certificate; two of these hook points (deploy_challenge and clean_challenge) can be used to issue commands to haproxy via it's admin socket to update the map with responses to ACME challenges
 * haproxy's [`http-request return`](http://docs.haproxy.org/2.6/configuration.html#http-request%20return) directive can be used to respond to client requests without forwarding to a backend and whose `lf-string` parameter can look up responses in the hook-maintained ACME map when the request's path begins with `/.well-known/acme-challenge/`
 * haproxy's [`ssl-load-extra-files`](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files) directive can be used to instruct haproxy to look for cert bundles named as follows:
