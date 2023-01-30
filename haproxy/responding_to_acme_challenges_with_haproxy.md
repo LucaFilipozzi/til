@@ -17,6 +17,11 @@ The key points:
 * haproxy can be configured to expose an admin socket over which commands may be issued, including the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
 * dehydrated can be configured to invoke a hook script, which it will call at various points during the process of obtaining a certificate; two of these hook points (deploy_challenge and clean_challenge) can be used to issue commands to haproxy via it's admin socket to update the map with responses to ACME challenges
 * haproxy's [`http-request return`](http://docs.haproxy.org/2.6/configuration.html#http-request%20return) directive can be used to respond to client requests without forwarding to a backend and whose `lf-string` parameter can look up responses in the hook-maintained ACME map when the request's path begins with `/.well-known/acme-challenge/`
+* haproxy's [`ssl-load-extra-files`](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files) directive can be used to instruct haproxy to look for cert bundles named as follows:
+    * «basename».\[rsa|ecdsa\] - contains the end-entity certificate and intermediate certificates (if any); equivalent to dehydrated's fullchain.pem
+    * «basename».\[rsa|ecdsa\].key - contains the end-entity private key; equivalent to dehydrated's privkey.pem
+    * «basename».\[rsa|ecdsa\].ocsp - contains the OCSP; equivalent to ocsp.der
+* haproxy's [`crt-list`](http://docs.haproxy.org/2.6/configuration.html#5.1-crt-list) directive can be used to 
 
 Additional observations:
 * dehydrated allows [multiple aliases per domain](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases)
@@ -46,7 +51,9 @@ WELLKNOWN="${BASEDIR}/acme-challenges"
 Specify [multiple aliases per domain](https://github.com/dehydrated-io/dehydrated/blob/master/docs/domains_txt.md#aliases) to leverage dehydrated's [alternate configurations per alias](https://github.com/dehydrated-io/dehydrated/blob/master/docs/per-certificate-config.md) feature to obtain both RSA and ECDSA certificates for a domain.
 
 ```text
-# format is: domainName [, domainAltName(s)] > alias
+# the format is:
+#   domainPrimaryName [, domainAlternameName(s)] > alias
+# multiple aliases per domainPrimaryName are permitted
 example.com > example.com.ecc
 example.com > example.com.rsa
 example.org > example.org.ecc
@@ -84,19 +91,21 @@ clean_challenge() {
 
 deploy_cert() {
     local DOMAIN="${1}" PRIVKEY="${2}" CERT="${3}" FULLCHAIN="${4}" CHAIN="${5}" TIMESTAMP="${6}"
-    local DIR=$(dirname ${PRIVKEY})
-    local ALG=$(openssl x509 -in ${DIR}/cert.pem -noout -text | awk -F':' '/Public Key Algorithm/ {print $2}' | tr -d ' ')
+    local SRC=$(dirname ${PRIVKEY})
+    local DST=/var/lib/haproxy/certs
+    local ALG=$(openssl x509 -in ${SRC}/cert.pem -noout -text | awk -F':' '/Public Key Algorithm/ {print $2}' | tr -d ' ')
     local EXT=${alg2ext[${ALG}]}
-    ln -sf ${FULLCHAIN} ${DIR}/haproxy.${EXT}
-    ln -sf ${PRIVKEY}   ${DIR}/haproxy.${EXT}.key
+    ln -sf ${FULLCHAIN} ${DST}/${DOMAIN}.${EXT}
+    ln -sf ${PRIVKEY}   ${DST}/${DOMAIN}.${EXT}.key
 }
 
 deploy_ocsp() {
     local DOMAIN="${1}" OCSP="${2}" TIMESTAMP="${3}"
-    local DIR=$(dirname ${OCSP})
-    local ALG=$(openssl x509 -in ${DIR}/cert.pem -noout -text | awk -F':' '/Public Key Algorithm/ {print $2}' | tr -d ' ')
+    local SRC=$(dirname ${OCSP})
+    local DST=/var/lib/haproxy/certs
+    local ALG=$(openssl x509 -in ${SRC}/cert.pem -noout -text | awk -F':' '/Public Key Algorithm/ {print $2}' | tr -d ' ')
     local EXT=${alg2ext[${ALG}]}
-    ln -sf ${OCSP}      ${DIR}/haproxy.${EXT}.ocsp
+    ln -sf ${OCSP}      ${DST}/${DOMAIN}.${EXT}.ocsp
 }
 
 unchanged_cert() {
@@ -116,7 +125,7 @@ generate_csr() {
 }
 
 startup_hook() {
-    :
+    mkdir -p /var/lib/haproxy/certs
 }
 
 exit_hook() {
@@ -126,6 +135,7 @@ exit_hook() {
 HANDLER="$1"; shift
 if [[ "${HANDLER}" =~ ^(deploy_challenge|clean_challenge|deploy_cert|deploy_ocsp|unchanged_cert|invalid_challenge|request_failure|generate_csr|startup_hook|exit_hook)$ ]]; then
     "$HANDLER" "$@"
+fi
 ```
 
 ### haproxy
@@ -138,11 +148,11 @@ if [[ "${HANDLER}" =~ ^(deploy_challenge|clean_challenge|deploy_cert|deploy_ocsp
 
 #### /etc/haproxy/cert.lst
 
+Only need to specify the basename when using haproxy's [ssl-load-extra-files](http://docs.haproxy.org/2.6/configuration.html#ssl-load-extra-files) feature.
+
 ```plaintext
-/var/lib/dehydrated/certs/example.com.rsa/haproxy  [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.com.ecc/haproxy  [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.org.rsa/haproxy  [alpn h2,http/1.1]
-/var/lib/dehydrated/certs/example.org.ecc/haproxy  [alpn h2,http/1.1]
+/var/lib/haproxy/certs/example.com
+/var/lib/haproxy/certs/example.org
 ```
 
 #### /etc/haproxy/haproxy.cfg
