@@ -8,14 +8,14 @@ This approach also gives me the flexibility of deploying different web servers (
 
 Of course, I desire that these web sites be available via HTTPS and I leverage [Let's Encrypt](https://letsencrypt.org/) for certificates, which I obtain using [`dehydrated`](https://github.com/dehydrated-io/dehydrated). I terminate the TLS connections at haproxy.
 
-In order to respond to the ACME challenges, I have been using [apache2-dehydrated](https://packages.debian.org/bullseye/dehydrated-apache2), Debian's packaging of dehydrated's [example apache2 configuration](https://github.com/dehydrated-io/dehydrated/blob/5c1551e946456f534cf46b6ebabe4353bf0b0530/docs/wellknown.md#apache-example-config) which supports responding to ACME challenges without configuring an apache2 virtual host.
+In order to respond to the ACME challenges, I have been using [apache2-dehydrated](https://packages.debian.org/bullseye/dehydrated-apache2), Debian's packaging of dehydrated's [example apache2 configuration](https://github.com/dehydrated-io/dehydrated/blob/5c1551e946456f534cf46b6ebabe4353bf0b0530/docs/wellknown.md#apache-example-config), which supports responding to ACME challenges without configuring an apache2 virtual host.
 
 But it has always bothered me that I needed apache2 to respond to ACME challenges for certificates used by haproxy... so I did something about it.
 
 The key points:
 
-* haproxy can be configured to [expose an admin socket](http://docs.haproxy.org/2.6/configuration.html#stats%20socket) over which instructions may be issued, including two which cause the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
-* dehydrated can be configured to invoke a [hook script](https://github.com/dehydrated-io/dehydrated/blob/e17456778f25326dc14bd8324ae70dd352d3578a/docs/examples/hook.sh) which it will call at various points during the process of obtaining a certificate: two of these hook points (deploy_challenge and clean_challenge) can be used to issue instructions to haproxy via its admin socket to maintain ACME challenge entries in a map
+* haproxy can be configured to [expose an admin socket](http://docs.haproxy.org/2.6/configuration.html#stats%20socket) over which instructions may be issued, including instructions which cause the [addition](http://docs.haproxy.org/2.6/management.html#add%20map) and [deletion](http://docs.haproxy.org/2.6/management.html#del%20map) of entries into an existing map
+* dehydrated can be configured to invoke a [hook script](https://github.com/dehydrated-io/dehydrated/blob/e17456778f25326dc14bd8324ae70dd352d3578a/docs/examples/hook.sh) which it will call at various _hook points_ during the process of obtaining a certificate: two of these hook points (_deploy_challenge_ and _clean_challenge_) can be used to issue instructions to haproxy via its admin socket to maintain ACME challenge entries in a map
 * haproxy's [`http-request return`](http://docs.haproxy.org/2.6/configuration.html#http-request%20return) directive can be used to respond to client requests without forwarding to a backend and whose `lf-string` parameter can look up responses in the hook script-maintained map when the request's path begins with `/.well-known/acme-challenge/`
 * haproxy's [`ssl-load-extra-files`](http://docs.haproxy.org/2.6/configuration.html#3.1-ssl-load-extra-files) directive can be used to instruct haproxy to look for cert bundles named as follows:
 
