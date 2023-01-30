@@ -80,7 +80,7 @@ declare -A alg2ext=( ["rsaEncryption"]="rsa" ["id-ecPublicKey"]="ecdsa" )
 
 deploy_challenge() {
     local DOMAIN="${1}" TOKEN="${2}" VALUE="${3}"
-    echo "add map  /etc/haproxy/acme.map ${TOKEN} ${VALUE}" | socat stdio unix-connect:/run/haproxy/admin.sock
+    echo "add map /etc/haproxy/acme.map ${TOKEN} ${VALUE}" | socat stdio unix-connect:/run/haproxy/admin.sock
 }
 
 clean_challenge() {
