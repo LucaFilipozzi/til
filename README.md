@@ -5,6 +5,7 @@ My Today I Learned snippets. Inspired by [jbranchaud/til][1] and [simonw/til][2]
 ### Categories
 
 #### haproxy
+* [generating `traceparent` headers with `haproxy`](haproxy/generating_traceparent_headers_with_haproxy.md)
 * [responding to acme challenges with `haproxy`](haproxy/responding_to_acme_challenges_with_haproxy.md)
 
 #### json
